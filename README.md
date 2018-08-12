@@ -1,1 +1,1 @@
-![alt text](Documentation/CourierLogo.png)
+#Courier
