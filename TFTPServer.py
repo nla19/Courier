@@ -72,7 +72,7 @@ class TFTPServer:
                 self.socket.sendto(bytes(response, 'utf-8'), self.clientaddr)
             elif chr(payload[0]) == '2':
                 filename, mode = self.decode_rw_packet(payload)
-                response = "Write request from {}".format(self.clientaddr[0])
+                response = "Write request from {}\nFilename: {} | Mode: {}".format(self.clientaddr[0], filename, mode)
                 print(response)
                 self.socket.sendto(bytes(response, 'utf-8'), self.clientaddr)
             elif chr(payload[0]) == '3':

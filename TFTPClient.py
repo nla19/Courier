@@ -81,17 +81,11 @@ class TFTPClient:
             pass
 
         try:
-            self.socket.sendto(payload, (self.serverHost, self.serverPort))
+            self.socket.send(payload)
         except socket.error as sockerr:
             print("Socket error: {}".format(sockerr))
         except IOError as ioerr:
             print("IO error: {}".format(ioerr))
-
-    def form_rw_packet(self, filename, mode):
-        pass
-
-    def form_data_packet(self, blocknum, data):
-        pass
 
     def receive_response(self):
         data, addr = self.socket.recvfrom(65535)
