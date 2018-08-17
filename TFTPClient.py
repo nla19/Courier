@@ -37,7 +37,7 @@
 #
 # To do:
 #       - implement shell function.
-#           * ASCII art welcome screen
+#           * Welcome screen
 #           * Shell commands:
 #               1. Connect (IP, Port)
 #               2. Read
@@ -87,6 +87,12 @@ class TFTPClient:
         except IOError as ioerr:
             print("IO error: {}".format(ioerr))
 
+    def form_rw_packet(self, filename, mode):
+        pass
+
+    def form_data_packet(self, blocknum, data):
+        pass
+
     def receive_response(self):
         data, addr = self.socket.recvfrom(65535)
         return data, addr
@@ -97,17 +103,3 @@ class TFTPClient:
         except socket.error as err:
             print("Socket error: {}".format(err))
             sys.exit()
-
-
-if __name__ == "__main__":
-    client = TFTPClient("192.168.1.8", 50008)
-    client.socket_create()
-    try:
-        while True:
-            request = input("{}>".format(client.serverHost))
-            client.request(request)
-            data, addr = client.receive_response()
-            print("Response from server: {}".format(str(data, "utf-8")))
-    except KeyboardInterrupt as intr:
-        pass
-    client.socket_close()

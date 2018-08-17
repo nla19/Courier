@@ -66,29 +66,32 @@ class TFTPServer:
         try:
             payload, self.clientaddr = self.socket.recvfrom(65535)
             if chr(payload[0])== '1':
-                response = "Read request from {}".format(self.clientaddr[0])
+                filename, mode = self.decode_rw_packet(payload)
+                response = "Read request from {}\nFilename: {} | Mode: {}".format(self.clientaddr[0], filename, mode)
                 print(response)
-                filename, mode = self.decode_read_packet(payload)
                 self.socket.sendto(bytes(response, 'utf-8'), self.clientaddr)
             elif chr(payload[0]) == '2':
+                filename, mode = self.decode_rw_packet(payload)
                 response = "Write request from {}".format(self.clientaddr[0])
                 print(response)
-                filename, mode = self.decode_write_packet(payload)
                 self.socket.sendto(bytes(response, 'utf-8'), self.clientaddr)
             elif chr(payload[0]) == '3':
-                respone = "Data from {}".format(self.clientaddr[0])
-                print(response)
                 blocknum, data = self.decode_data_packet(payload)
+                response = "Data from {}".format(self.clientaddr[0])
+                print(response)
+                print("Block number: {}, Data: {}".format(blocknum, data))
                 self.socket.sendto(bytes(response, 'utf-8'), self.clientaddr)
             elif chr(payload[0]) == '4':
                 response = "Acknowledge from {}".format(self.clientaddr[0])
-                print(response)
                 acknum = self.decode_ack_packet(payload)
+                print(response)
+                print("Acknowledgement Number: {}".format(acknum))
                 self.socket.sendto(bytes(response, 'utf-8'), self.clientaddr)
             elif chr(payload[0]) == '5':
                 response = "Error from {}".format(self.clientaddr[0])
+                error_code, error_msg = self.decode_error_packet(payload)
                 print(response)
-                errcode, errmsg = self.decode_error_packet(payload)
+                print("Error code: {}, Error msg: {}".format(error_code, error_msg))
                 self.socket.sendto(bytes(response, 'utf-8'), self.clientaddr)
             else:
                 response = "Malformed packet from {}".format(self.clientaddr[0])
@@ -99,6 +102,9 @@ class TFTPServer:
             return payload
         except socket.error as se:
             self.socket.sendto(b'Socket error raised', self.clientaddr)
+        except KeyboardInterrupt as intr:
+            self.socket_close()
+            sys.exit()
 
     def socket_close(self):
         try:
@@ -107,27 +113,27 @@ class TFTPServer:
             print("Socket error: {}".format(err))
             sys.exit()
 
-    def decode_read_packet(self, payload):
-        print(payload)
-        return None, None
-
-
-    def decode_write_packet(self, payload):
-        print(payload)
-        return None, None
-
+    def decode_rw_packet(self, payload):
+        filename = payload[1:str(payload).find('0') - 2]
+        mode = payload[str(payload).find('0') -1:str(payload).rfind('0') - 2]
+        return filename, mode
 
     def decode_data_packet(self, payload):
         print(payload)
-        return None, None
+        blocknum = payload[2:4]
+        data = payload[5:]
+        return blocknum, data
 
     def decode_ack_packet(self, payload):
         print(payload)
-        return None
+        ack = payload[2:]
+        return ack
 
     def decode_error_packet(self, payload):
         print(payload)
-        return None, None
+        error_code = payload[2:4]
+        error_msg = payload[5:-1]
+        return error_code, error_msg
 
 
 if __name__ == "__main__":
