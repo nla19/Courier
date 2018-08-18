@@ -36,14 +36,6 @@
 #               -----------------------------------------
 #
 # To do:
-#       - implement shell function.
-#           * Welcome screen
-#           * Shell commands:
-#               1. Connect (IP, Port)
-#               2. Read
-#               3. Write
-#               4. Exit
-#               5. Help
 #       - implement form packet methods for 5 packet types
 #       - does the client form error packets?
 import socket
